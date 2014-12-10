@@ -1,0 +1,14 @@
+Package: InvariantCausalPrediction
+Type: Package
+Title: Invariant Causal Prediction
+Version: 0.1-4
+Date: 2014-12-10
+Author: Nicolai Meinshausen
+Depends: glmnet, mboost
+Maintainer: Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
+Description: Confidence intervals for causal prediction in a regression setting. An experimental version is also available for classification. 
+License: GPL
+Packaged: 2014-12-12 10:22:33 UTC; nicolai
+NeedsCompilation: no
+Repository: CRAN
+Date/Publication: 2014-12-12 14:44:35
