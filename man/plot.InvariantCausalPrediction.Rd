@@ -41,7 +41,11 @@ Additional inputs to generic \code{plot} function (not used).
 Does not return an object.
 }
 \references{
-Not yet...
+Jonas Peters, Peter Buhlmann, Nicolai Meinshausen (2015):
+
+ Causal inference using invariant prediction: identification and confidence intervals
+
+ arxiv preprint \url{http://arxiv.org/abs/1501.01332}
 }
 \author{
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>

@@ -1,5 +1,5 @@
 ICP <-
-function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","stability","boosting")[if(ncol(X)<=10) 2 else 4], maxNoVariables=10, maxNoVariablesSimult=10, maxNoObs=200, showAcceptedSets=TRUE, showCompletion=TRUE, stopIfEmpty = FALSE){
+function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","stability","boosting")[if(ncol(X)<=10) 2 else 4], maxNoVariables=10, maxNoVariablesSimult=10, maxNoObs=200, gof=NULL, showAcceptedSets=TRUE, showCompletion=TRUE, stopIfEmpty = FALSE){
     if(!is.list(ExpInd)){
         if(length(ExpInd)!=length(Y)) stop("if `ExpInd' is a vector, it needs to have the same length as `Y'")
         uni <- unique(ExpInd)
@@ -53,6 +53,7 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
             X <- as.matrix(X)
         }
     }
+    if(length(ucol <- unique(colnames(X)))< min(3, ncol(X))) colnames(X) <- paste("Variable",1:ncol(X),sep="_")
 
     if( length(unique(Y))==2 & !is.factor(Y)){
         warning("\n Y only has 2 unique values -- using classification")
@@ -129,9 +130,19 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
     sig <- apply(sign(Clist[2:1,]),2,function(x) prod(x))
     sigo <- sign(Clist[1,])
     maximin <- sigo*apply(abs(Clist[2:1,]),2,min) * (sig>=0)
+
+    if(is.null(gof)){
+        modelReject <- (max(sapply(Coeff,length))==0)
+    }else{
+        modelReject <- TRUE
+        if(length(pvall)>0){
+            modelReject <- (max(pvall) < gof)
+        }
+    }
+
     
-    retobj <- list(ConfInt=Clist,maximinCoefficients=maximin,alpha=alpha,colnames=colnames(Clist),factor=is.factor(Y),dimX=dim(X),Coeff=Coeff,CoeffVar=CoeffVar,modelReject=(max(sapply(Coeff,length))==0),usedvariables=usedvariables)
+    retobj <- list(ConfInt=Clist,maximinCoefficients=maximin,alpha=alpha,colnames=colnames(Clist),factor=is.factor(Y),dimX=dim(X),Coeff=Coeff,CoeffVar=CoeffVar,modelReject=modelReject,usedvariables=usedvariables)
     class(retobj) <- "InvariantCausalPrediction"
-    cat("\n\n")
+    if(showAcceptedSets) cat("\n\n")
     return(retobj)
 }

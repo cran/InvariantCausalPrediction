@@ -4,7 +4,7 @@
 Invariant Causal Prediction
 }
 \description{
-Confidence intervals for causal prediction.
+Confidence intervals for causal effects in a regression setting.
 }
 \usage{
 ICP(X, Y, ExpInd, alpha = 0.1, test = "approximate",
@@ -12,6 +12,7 @@ ICP(X, Y, ExpInd, alpha = 0.1, test = "approximate",
                                       [if (ncol(X) <=10) 2 else 4],
               maxNoVariables = 10, maxNoVariablesSimult = 10,
               maxNoObs = 200,
+              gof = NULL,
               showAcceptedSets = TRUE,
               showCompletion = TRUE,
               stopIfEmpty = FALSE)
@@ -64,7 +65,15 @@ ICP(X, Y, ExpInd, alpha = 0.1, test = "approximate",
   The maximal number of observations used for the "exact" test 
   (same comment as for \code{maxNoVariables}).
 }
-  \item{showAcceptedSets}{
+ \item{gof}{
+  The best set of variables has to have a p-value at least \code{gof}
+  (the output \code{modelReject} will return \code{TRUE} otherwise). 
+  Allows to check whether the model assumptions are approximately satisfied. 
+  Defaults to a value \code{NULL}, where no such check takes place
+  (but the model might still be rejected if the best set of variables 
+   has a p-value lower than the threshold \code{alpha})
+}
+\item{showAcceptedSets}{
   If \code{TRUE}, print out information about accepted sets of variables.
 }
   \item{showCompletion}{
@@ -92,10 +101,14 @@ A list with elements
    \item{dimX}{The dimensions of the matrix with predictor variables.}
    \item{Coeff}{A list which contains for all variables the vector with point-estimates among all accepted sets where the variable was part of the set.}
   \item{CoeffVar}{Same as \code{Coeff} but with the standard deviation of the point-estimate.}
-  \item{modelReject}{Logical indicating if the whole model was rejected (not a single set of variables accepted).}
+  \item{modelReject}{Logical indicating if the whole model was rejected (the p-value of the best fitting model is too low).}
 }
 \references{
- Not yet...
+ Jonas Peters, Peter Buhlmann, Nicolai Meinshausen (2015):
+
+ Causal inference using invariant prediction: identification and confidence intervals
+
+ arxiv preprint \url{http://arxiv.org/abs/1501.01332}
 }
 \author{
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
