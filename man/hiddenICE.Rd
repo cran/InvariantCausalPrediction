@@ -1,5 +1,5 @@
-\name{feedbackNetwork}
-\alias{feedbackNetwork}
+\name{hiddenICE}
+\alias{hiddenICE}
 \title{
 Estimate connectivity matrix of a directed graph with linear effects and hidden variables. 
 }
@@ -10,7 +10,7 @@ It is assumed that equilibrium data are observed so that X = X \%*\% A + I, wher
 The goal is to estimate the connectivity matrix A.
 }
 \usage{
-feedbackNetwork(X, ExpInd, covariance=TRUE, alpha = 0.1, 
+hiddenICE(X, ExpInd, covariance=TRUE, alpha = 0.1, 
                            threshold =0.75, nsim=100, 
                            sampleScenarios=0.5, nodewise=TRUE )
 }
@@ -93,7 +93,7 @@ Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
    
 
 ####### Compute feedback estimator with E(V)<=1
-      network <- feedbackNetwork(X,ExpInd,alpha=1)
+      network <- hiddenICE(X,ExpInd,alpha=1)
 
  ###### Print point estimates and stable edges
       print(A) ## true connectivity matrix

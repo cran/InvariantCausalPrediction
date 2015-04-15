@@ -1,5 +1,5 @@
 import(graphics,glmnet,mboost,jointDiag)
-export(ICP,hiddenICP,feedbackNetwork)
+export(ICP,hiddenICP,hiddenICE)
 S3method(summary,InvariantCausalPrediction)
 S3method(plot, InvariantCausalPrediction)
 S3method(print, InvariantCausalPrediction)

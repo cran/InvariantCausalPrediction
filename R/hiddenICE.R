@@ -1,4 +1,4 @@
-feedbackNetwork <- function(X, ExpInd, covariance=TRUE, alpha=0.1, threshold =0.75, nsim=100, sampleScenarios=0.5, nodewise=TRUE ){
+hiddenICE <- function(X, ExpInd, covariance=TRUE, alpha=0.1, threshold =0.75, nsim=100, sampleScenarios=0.5, nodewise=TRUE ){
 
 
     X <- as.matrix(X)
