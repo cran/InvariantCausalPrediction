@@ -113,7 +113,9 @@ A list with elements
 \author{
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 }
-
+\seealso{  \code{\link{hiddenICP}} for reconstructing the parents of a variable in the presence of  hidden variables 
+(but assuming additive interventions) and \code{\link{hiddenICE}} 
+for reconstruction of a whole directed graph with hidden variables (without confidence intervals).}
 \examples{
  ##########################################
  ####### 1st example:

@@ -1,5 +1,7 @@
 ICP <-
 function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","stability","boosting")[if(ncol(X)<=10) 2 else 4], maxNoVariables=10, maxNoVariablesSimult=10, maxNoObs=200, gof=NULL, showAcceptedSets=TRUE, showCompletion=TRUE, stopIfEmpty = FALSE){
+    if(!is.matrix(X) & !is.data.frame(X)) stop("'X' must be a matrix of data frame")
+    if(!is.vector(Y)) stop("'Y' must be a vector")
     if(!is.list(ExpInd)){
         if(length(ExpInd)!=length(Y)) stop("if `ExpInd' is a vector, it needs to have the same length as `Y'")
         uni <- unique(ExpInd)
@@ -16,7 +18,8 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
         if(ran[1]<1) stop(paste("if `ExpInd' is a list with indicies of observations, \n minimal entry has to be at least 1 but is",ran[1]))
         if(ran[2]>length(Y)) stop(paste("if `ExpInd' is a list with indicies of observations, \n maximal entry has to be at most equal \n to the length",length(Y),"of the observations but is",ran[2]))
     }
-
+    if(!is.null(gof)) if(gof<0 | gof>1) stop("'gof' needs to be in [0,1]")
+    
     getblanket <- getblanketall
     if(selection=="lasso"){
         getblanket <- getblanketlasso
@@ -143,6 +146,5 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
     
     retobj <- list(ConfInt=Clist,maximinCoefficients=maximin,alpha=alpha,colnames=colnames(Clist),factor=is.factor(Y),dimX=dim(X),Coeff=Coeff,CoeffVar=CoeffVar,modelReject=modelReject,usedvariables=usedvariables)
     class(retobj) <- "InvariantCausalPrediction"
-    if(showAcceptedSets) cat("\n\n")
     return(retobj)
 }

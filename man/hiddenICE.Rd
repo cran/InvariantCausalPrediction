@@ -12,7 +12,8 @@ The goal is to estimate the connectivity matrix A.
 \usage{
 hiddenICE(X, ExpInd, covariance=TRUE, alpha = 0.1, 
                            threshold =0.75, nsim=100, 
-                           sampleScenarios=0.5, nodewise=TRUE )
+                           sampleSettings=1/sqrt(2), sampleObservations=1/sqrt(2), 
+                           nodewise=TRUE )
 }
 \arguments{
   \item{X}{
@@ -35,8 +36,12 @@ Set only to \code{FALSE} if at most one variable has a non-zero shift in mean in
   \item{nsim}{
   Number of resamples taken (if using stability selection). 
 }
- \item{sampleScenarios}{
-  The proportion of unique settings to resample for each resample (default is to sample half of all unique settings).
+ \item{sampleSettings}{
+  The proportion of unique settings to resample for each resample; has to be in [0,1].
+}
+
+ \item{sampleObservations}{
+  The fraction of all samples to retain when subsampling (no replacement); has to be in [0,1].
 }
 \item{nodewise}{
    If \code{FALSE}, stability selection retains for each subsample the largest overall entries in the connectivity matrix.
@@ -48,7 +53,8 @@ Error control is valid (under exchangeability assumption) in both cases. The lat
 \value{
 A list with elements
   \item{Ahat}{The connectivity matrix where entry (i,j) is the effect pointing from variable i to variable j.}
-  \item{AhatAdjacency}{If \code{alpha}>0, the connectivity matrix retained by stability selection. Entries give the rounded percentage of times the edge has been retained (and 0 if below the critical threshold).}
+  \item{AhatAdjacency}{If \code{alpha}>0, the connectivity matrix retained by stability selection. 
+       Entries give the rounded percentage of times the edge has been retained (and 0 if below the critical threshold).}
 }
 \references{
     none yet...
@@ -56,7 +62,9 @@ A list with elements
 \author{
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 }
-
+\seealso{  \code{\link{ICP}} for reconstructing the parents of a variable under arbitrary interventions on all other variables (but without hidden variables) and \code{\link{hiddenICP}} 
+for the same goal with hidden variables (but only additive interventions).
+}
 \examples{
  ##########################################
  ####### 1st example:

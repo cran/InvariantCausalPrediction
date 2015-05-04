@@ -2,6 +2,8 @@
 hiddenICP <-
 function(X,Y,ExpInd,alpha=0.1,mode="asymptotic",intercept=TRUE){
 
+    if(!is.matrix(X) & !is.data.frame(X)) stop("'X' must be a matrix of data frame")
+    if(!is.vector(Y)) stop("'Y' must be a vector")
     if(nrow(X) <= ncol(X)) stop(paste( "hiddenICP not suitable for high-dimensional data (at the moment) \n -- need nrow(X)>ncol(X) but have nrow(X)=",nrow(X)," and ncol(X)=",ncol(X)))
 
     if(intercept){
