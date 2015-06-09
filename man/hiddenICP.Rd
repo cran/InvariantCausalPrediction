@@ -54,8 +54,9 @@ A list with elements
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 }
 \seealso{  \code{\link{ICP}} for reconstructing the parents of a variable 
-under arbitrary interventions on all other variables (but no hidden variables) and 
-\code{\link{hiddenICE}} for reconstruction of a whole directed graph with hidden variables (without confidence intervals).}
+under arbitrary interventions on all other variables (but no hidden variables). 
+See package "backShift" for constructing point estimates of causal cyclic models in the presence of hidden variables (again under shift interventions) .
+}
 \examples{
  ##########################################
  ####### 1st example:
