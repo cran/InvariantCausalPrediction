@@ -129,7 +129,7 @@ Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
     ## divide data into observational (ExpInd=1) and interventional (ExpInd=2)
       ExpInd <- c(rep(1,n/2),rep(2,n/2))
     ## for interventional data (ExpInd==2): change distribution
-      X[ExpInd==2,] <- sweep(X[ExpInd==2,],1, 4*rnorm(p) ,FUN="*")
+      X[ExpInd==2,] <- sweep(X[ExpInd==2,],2, 4*rnorm(p) ,FUN="*")
     ## first two variables are the causal predictors of Y
       beta <- c(1,1,rep(0,p-2))
     ## response variable Y

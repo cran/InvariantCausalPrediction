@@ -1,14 +1,14 @@
 Package: InvariantCausalPrediction
 Type: Package
 Title: Invariant Causal Prediction
-Version: 0.3-3
-Date: 2015-06-09
+Version: 0.3-4
+Date: 2015-09-17
 Author: Nicolai Meinshausen
 Depends: glmnet, mboost
 Maintainer: Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 Description: Confidence intervals for causal effects, using data collected in different experimental or environmental conditions. Hidden variables can be included in the model with a more experimental version. 
 License: GPL
 NeedsCompilation: no
-Packaged: 2015-06-10 15:47:42 UTC; nicolai
+Packaged: 2015-09-17 19:40:14 UTC; nicolai
 Repository: CRAN
-Date/Publication: 2015-06-10 19:00:54
+Date/Publication: 2015-09-17 22:49:45

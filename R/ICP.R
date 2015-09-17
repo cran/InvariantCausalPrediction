@@ -130,9 +130,9 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
     colnames(Clist) <- colnames(X[,-1,drop=FALSE])
     if(is.null(colnames(Clist))) colnames(Clist) <- paste("Variable", 1:ncol(Clist))
 
-    sig <- apply(sign(Clist[2:1,]),2,function(x) prod(x))
+    sig <- apply(sign(Clist[2:1, ,drop=FALSE]),2,function(x) prod(x))
     sigo <- sign(Clist[1,])
-    maximin <- sigo*apply(abs(Clist[2:1,]),2,min) * (sig>=0)
+    maximin <- sigo*apply(abs(Clist[2:1, ,drop=FALSE]),2,min) * (sig>=0)
 
     if(is.null(gof)){
         modelReject <- (max(sapply(Coeff,length))==0)
