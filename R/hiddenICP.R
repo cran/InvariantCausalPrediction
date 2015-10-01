@@ -1,18 +1,22 @@
 
 hiddenICP <-
-function(X,Y,ExpInd,alpha=0.1,mode="asymptotic",intercept=TRUE){
+function(X,Y,ExpInd,alpha=0.1,mode="asymptotic",intercept=FALSE){
 
     if(!is.matrix(X) & !is.data.frame(X)) stop("'X' must be a matrix of data frame")
     if(!is.vector(Y)) stop("'Y' must be a vector")
     if(nrow(X) <= ncol(X)) stop(paste( "hiddenICP not suitable for high-dimensional data (at the moment) \n -- need nrow(X)>ncol(X) but have nrow(X)=",nrow(X)," and ncol(X)=",ncol(X)))
 
-    if(intercept){
-        X <- cbind(rep(1,nrow(X)),X)
-    }
     
     if(!is.list(ExpInd)){
         if(length(ExpInd)!=length(Y)) stop("if `ExpInd' is a vector, it needs to have the same length as `Y'")
         uni <- unique(ExpInd)
+        if(length(uni)==1) stop(paste("there is just one environment ('ExpInd'=",uni[1]," for all observations) and the method needs at least two distinct environments",sep=""))
+        if(min(table(ExpInd))<=2){
+            cat("\n out put of 'table(ExpInd)':\n ")
+            print(table(ExpInd))
+            stop("one environment has just one or two observations (as supllied by 'ExpInd'); there need to be at least 3 (and ideally dozens) of observations in each environment; the out put of 'table(ExpInd)' is given below to show the number of observations in each unique environment as supplied by 'ExpInd'")
+        }
+        
         K <- length(uni)
         ExpIndNEW <- list()
         for (uc in 1:K){
@@ -27,12 +31,22 @@ function(X,Y,ExpInd,alpha=0.1,mode="asymptotic",intercept=TRUE){
         if(ran[2]>length(Y)) stop(paste("if `ExpInd' is a list with indicies of observations, \n maximal entry has to be at most equal \n to the length",length(Y),"of the observations but is",ran[2]))
     }
     X <- as.matrix(X)
+    if(length(ucol <- unique(colnames(X)))< min(3, ncol(X))) colnames(X) <- paste("Variable",1:ncol(X),sep="_")
+    colX <- colnames(X)
+
+    
+    if(intercept){
+        X <- cbind(rep(1,nrow(X)),X)
+    }
+
     K <- length(ExpInd)
     p <- ncol(X)
     n <- nrow(X)
 
     kc <- 1
     KC <- if(K>2) K else 1
+    ConfInt <- matrix(NA, nrow=2,ncol=p)
+    pvalues <- rep(1,p)
     for (kc in 1: KC){
         ins <- ExpInd[[kc]]
         out <- (1:n)[-ins]
@@ -54,8 +68,13 @@ function(X,Y,ExpInd,alpha=0.1,mode="asymptotic",intercept=TRUE){
             Zout[i,] <- as.numeric(- tmp * sum(tmp*Drho) + Y[out[i]] *tmp)
         }
         sigmavec <- sqrt(diag((cov(Zin)/length(ins)+cov(Zout)/length(out))))
+
+        pvalues <- pmin(pvalues, 2*K* (1-pt( abs(betahat)/pmax(10^(-10),sigmavec),df=n-1)))
         
-        maximineffectsN <- sign(betahat) * pmax( 0, abs(betahat) - qnorm(max(0.5,1-alpha/(p*K))) * sigmavec)
+        addvar <- qnorm(max(0.5,1-alpha/(2*K))) * sigmavec
+        maximineffectsN <- sign(betahat) * pmax( 0, abs(betahat) - addvar)
+        ConfInt[1,] <- pmax(ConfInt[1,], betahat - addvar,na.rm=TRUE) 
+        ConfInt[2,] <- pmin(ConfInt[2,], betahat + addvar,na.rm=TRUE) 
         if(kc==1){
             maximineffects <- maximineffectsN
         }else{
@@ -69,8 +88,11 @@ function(X,Y,ExpInd,alpha=0.1,mode="asymptotic",intercept=TRUE){
     if(intercept){
         betahat <- betahat[-1]
         maximinCoefficients <- maximinCoefficients[-1]
+        ConfInt <- ConfInt[,-1]
+        pvalues <- pvalues[-1]
     }
-    retobj <- list(betahat=betahat,maximinCoefficients=maximinCoefficients)
+    ConfInt <- apply(ConfInt,2,sort,decreasing=TRUE)
+    retobj <- list(betahat=betahat,maximinCoefficients=maximinCoefficients,ConfInt=ConfInt,pvalues=pvalues,colnames=colX,alpha=alpha)
     class(retobj) <- "hiddenInvariantCausalPrediction"
     return(retobj)
                        

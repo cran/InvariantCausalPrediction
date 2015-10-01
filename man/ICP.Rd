@@ -7,12 +7,11 @@ Invariant Causal Prediction
 Confidence intervals for causal effects in a regression setting.
 }
 \usage{
-ICP(X, Y, ExpInd, alpha = 0.1, test = "approximate",
+ICP(X, Y, ExpInd, alpha=0.01, test = "normal",
               selection = c("lasso", "all", "stability", "boosting")
-                                      [if (ncol(X) <=10) 2 else 4],
-              maxNoVariables = 10, maxNoVariablesSimult = 10,
+                                      [if (ncol(X) <=8) 2 else 4],
+              maxNoVariables = 8, maxNoVariablesSimult = 8,
               maxNoObs = 200,
-              gof = NULL,
               showAcceptedSets = TRUE,
               showCompletion = TRUE,
               stopIfEmpty = FALSE)
@@ -32,18 +31,15 @@ ICP(X, Y, ExpInd, alpha = 0.1, test = "approximate",
   intervention data). 
   Can also be a list, where each element of the list contains the
   indices of all observations that belong to the corresponding grouping
-  in the data (for example two elements: first element is a vector that contains indices
-  of observations that are observational data and 
+  in the data (for example two elements: first element is a vector that contains indices of observations that are observational data and 
   second element is a vector that contains indices 
   of all observations that are of interventional type).
 }
-  \item{alpha}{
-  The level of the test procedure. Use the default \code{alpha}=0.1 
-  to obtain 90\% confidence intervals.
+\item{alpha}{
+     Determines coverage of the confidence regions. \code{alpha} is the probability of non-coverage, so the default of 0.01 produces 99\% confidence intervals. If no model has a p-value of at least \code{alpha}, the model assumptions seem violated and \code{modelReject} will return \code{TRUE}.
 }
   \item{test}{
-  Use "exact" for an exact test in a regression setting, especially if sample size is small. 
-  Can be computationally demanding if sample size is high. Defaults to "approximate".
+  Use "exact" for an exact test in a regression setting, especially if sample size is small. However, this test is computationally demanding if sample size is high. Defaults to "normal" that tests for a shift in mean and variance between two populations. Other options are "ranks" that uses a rank-based alternative and "ks" for a Kolmogorov-Smirnov test. It is also possible to supply a function of the form \code{function(x,z)}  that takes samples \code{x} and \code{z} of two populations as arguments and whose return value is the p-value for the null hypothesis that the two underlying distribution are identical.
 }
   \item{selection}{
   The method for pre-selection of variables to save computational resources. 
@@ -64,14 +60,6 @@ ICP(X, Y, ExpInd, alpha = 0.1, test = "approximate",
   \item{maxNoObs}{
   The maximal number of observations used for the "exact" test 
   (same comment as for \code{maxNoVariables}).
-}
- \item{gof}{
-  The best set of variables has to have a p-value at least \code{gof}
-  (the output \code{modelReject} will return \code{TRUE} otherwise). 
-  Allows to check whether the model assumptions are approximately satisfied. 
-  Defaults to a value \code{NULL}, where no such check takes place
-  (but the model might still be rejected if the best set of variables 
-   has a p-value lower than the threshold \code{alpha})
 }
 \item{showAcceptedSets}{
   If \code{TRUE}, print out information about accepted sets of variables.
@@ -95,13 +83,15 @@ A list with elements
     First row is the upper bound and second row the lower bound.}
   \item{maximinCoefficients}{The value in the confidence interval
     closest to 0. Is hence non-zero for variables with significant effects.}
-  \item{alpha}{Chosen level of the procedure.}
   \item{colnames}{The names of the variables (replaced with generic "Variable 1" etc. if not available).}
    \item{factor}{Logical indicating whether the response is a factor or not.}
    \item{dimX}{The dimensions of the matrix with predictor variables.}
    \item{Coeff}{A list which contains for all variables the vector with point-estimates among all accepted sets where the variable was part of the set.}
   \item{CoeffVar}{Same as \code{Coeff} but with the standard deviation of the point-estimate.}
   \item{modelReject}{Logical indicating if the whole model was rejected (the p-value of the best fitting model is too low).}
+  \item{usedvariables}{The pre-selected variables if not all variables are used for the analysis; otherwise all variables.}
+  \item{pvalues}{The p-values of all variables.}
+  \item{noEnv}{The number of distinct environments.}
 }
 \references{
  Jonas Peters, Peter Buhlmann, Nicolai Meinshausen (2015):
@@ -119,9 +109,9 @@ Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
  ##########################################
  ####### 1st example:
  ####### Simulate data with interventions
-      set.seed(21)
+set.seed(1)
     ## sample size n
-      n <- 1000
+      n <- 4000
     ## 5 predictor variables
       p  <- 5
     ## simulate as independent Gaussian variables
@@ -129,19 +119,24 @@ Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
     ## divide data into observational (ExpInd=1) and interventional (ExpInd=2)
       ExpInd <- c(rep(1,n/2),rep(2,n/2))
     ## for interventional data (ExpInd==2): change distribution
-      X[ExpInd==2,] <- sweep(X[ExpInd==2,],2, 4*rnorm(p) ,FUN="*")
+      X[ExpInd==2,] <- sweep(X[ExpInd==2,],2, 5*rnorm(p) ,FUN="*")
     ## first two variables are the causal predictors of Y
       beta <- c(1,1,rep(0,p-2))
     ## response variable Y
       Y <- as.numeric(X\%*\%beta + rnorm(n))
+   ## optinal: make last variable a child of Y (so last variable is non-causal for Y)
+      X[,p] <- 0.3*Y + rnorm(n)
 
  ####### Compute "Invariant Causal Prediction" Confidence Intervals
       icp <- ICP(X,Y,ExpInd)
 
  ###### Print/plot/show summary of output
       print(icp)
-      summary(icp)
       plot(icp)
+
+#### compare with linear model 
+      cat("\n compare with linear model  \n")            
+      print(summary(lm(Y~X)))
 
 
 ##########################################
@@ -161,12 +156,24 @@ Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
      X <- cbind(X1, X2, X3)
 
  ### Compute "Invariant Causal Prediction" Confidence Intervals
-     icp <- ICP(X, Y, ExpInd)
+  ## use a rank-based test to detect shift in distribution of residuals
+     icp <- ICP(X, Y, ExpInd,test="ranks")
+  ## use a Kolmogorov-Smirnov test to detect shift in distribution of residuals
+     icp <- ICP(X, Y, ExpInd,test="ks")
+  ## can also supply test as a function
+  ## here chosen to be equivalent to option "ks" above
+     icp <- ICP(X, Y, ExpInd,test=function(x,z) ks.test(x,z)$p.val)
+ ## use a test based on normal approximations
+     icp <- ICP(X, Y, ExpInd, test="normal")
+
 
  ### Print/plot/show summary of output
      print(icp)
-     summary(icp)
      plot(icp)
+
+#### compare with linear model 
+     cat("\n compare with linear model \n")            
+     print(summary(lm(Y~X)))
 
 
 
@@ -194,7 +201,7 @@ Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
   ## searching all subsets (use selection="lasso" or selection="stability"
   ##     to select a subset of subsets to search)
   ## with selection="all" the function will take several minutes
-    icp <- ICP(X,Y,ExpInd,selection="all")
+    icp <- ICP(X,Y,ExpInd,selection="all",alpha=0.1)
 
   ## Print/plot/show summary of output
      print(icp)

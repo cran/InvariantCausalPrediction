@@ -1,10 +1,22 @@
 ICP <-
-function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","stability","boosting")[if(ncol(X)<=10) 2 else 4], maxNoVariables=10, maxNoVariablesSimult=10, maxNoObs=200, gof=NULL, showAcceptedSets=TRUE, showCompletion=TRUE, stopIfEmpty = FALSE){
+function(X,Y,ExpInd,alpha=0.01, test="normal", selection = c("lasso","all","stability","boosting")[if(ncol(X)<=8) 2 else 4], maxNoVariables=8, maxNoVariablesSimult=8, maxNoObs=200, showAcceptedSets=TRUE, showCompletion=TRUE, stopIfEmpty = FALSE){
     if(!is.matrix(X) & !is.data.frame(X)) stop("'X' must be a matrix of data frame")
-    if(!is.vector(Y)) stop("'Y' must be a vector")
+    if(!is.vector(Y) & !is.factor(Y)) stop("'Y' must be a vector or factor")
+    if(is.function( test)){
+        pval <- test((1:10)+0.5,1:10) 
+        if( !is.numeric(pval)) stop("function 'test' has to return a numeric value")
+        if(length(pval)>1) stop("function 'test' needs to return a scalar (the p-value of the null hypothesis test that 'x' and 'z' are sampled from the same distribution")
+        if( pval<0 | pval>1) stop("the p-value of function 'test' needs to be in [0,1]")
+    }
     if(!is.list(ExpInd)){
         if(length(ExpInd)!=length(Y)) stop("if `ExpInd' is a vector, it needs to have the same length as `Y'")
         uni <- unique(ExpInd)
+        if(length(uni)==1) stop(paste("there is just one environment ('ExpInd'=",uni[1]," for all observations) and the method needs at least two distinct environments",sep=""))
+        if(min(table(ExpInd))<=2){
+            cat("\n out put of 'table(ExpInd)':\n ")
+            print(table(ExpInd))
+            stop("one environment has just one or two observations (as supplied by 'ExpInd'); there need to be at least 3 (and ideally dozens) of observations in each environment; the output of 'table(ExpInd)' is given below to show the number of observations in each unique environment as supplied by 'ExpInd'")
+        }
         K <- length(uni)
         ExpIndNEW <- list()
         for (uc in 1:K){
@@ -17,8 +29,8 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
         ran <- range(unlist(ExpInd))
         if(ran[1]<1) stop(paste("if `ExpInd' is a list with indicies of observations, \n minimal entry has to be at least 1 but is",ran[1]))
         if(ran[2]>length(Y)) stop(paste("if `ExpInd' is a list with indicies of observations, \n maximal entry has to be at most equal \n to the length",length(Y),"of the observations but is",ran[2]))
+        if(min( sapply( ExpInd,length)<=2)) stop("one environment has just one or two observations (as supplied by 'ExpInd'); there need to be at least 3 (and ideally dozens) of observations in each environment")
     }
-    if(!is.null(gof)) if(gof<0 | gof>1) stop("'gof' needs to be in [0,1]")
     
     getblanket <- getblanketall
     if(selection=="lasso"){
@@ -30,7 +42,6 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
     if(selection=="boosting"){
         getblanket <- getblanketboosting
     }
-
     if(is.data.frame(X)){
         if(any(sapply(X,class)=="factor")){
             Z <- X
@@ -69,7 +80,7 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
     p <- ncol(X)
     X <- cbind(rep(1,nrow(X)),X)
     
-    Clist <- matrix(NA,nrow=2,ncol=p)
+    ConfInt <- matrix(NA,nrow=2,ncol=p)
     Coeff <- list()
     CoeffVar <- list()
     for (k in 1:p){
@@ -77,6 +88,7 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
         CoeffVar[[k]] <- numeric(0)
     }
     pvall <- numeric(0)
+    Pall <- numeric()
     
     cont <- TRUE
     pvalempty <- getpval(Y,X[,1,drop=FALSE],ExpInd,test=test,maxNoObs=maxNoObs)$pval
@@ -84,7 +96,7 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
     
     if(pvalempty > alpha){
         
-        Clist <- matrix(0,nrow=2,ncol=p)
+        ConfInt <- matrix(0,nrow=2,ncol=p)
         pvall <- c(pvall, pvalempty)
         if(showAcceptedSets) cat(paste("\n  accepted empty set"))
         if(stopIfEmpty) cont <- FALSE
@@ -110,41 +122,41 @@ function(X,Y,ExpInd,alpha=0.1, test="approximate", selection = c("lasso","all","
         
         tmp <- getpval(Y,X[, c(1,1+usevariab),drop=FALSE],ExpInd,test=test,maxNoObs=maxNoObs)
         pval <- tmp$pval
+        Pall <- c(Pall,pval)
         if(pval > alpha){
             if(showAcceptedSets) cat(paste("\n accepted set of variables ", paste(usevariab,collapse=","),sep=""))
-            Clist[1,usevariab] <- pmax(Clist[1,usevariab,drop=FALSE],tmp$coefficients + qnorm(1-alpha/4) * tmp$coefficientsvar,na.rm=TRUE)
-            Clist[2,usevariab] <- pmin(Clist[2,usevariab,drop=FALSE],tmp$coefficients - qnorm(1-alpha/4) * tmp$coefficientsvar,na.rm=TRUE)
+            ConfInt[1,usevariab] <- pmax(ConfInt[1,usevariab,drop=FALSE],tmp$coefficients + qnorm(1-alpha/4) * tmp$coefficientsvar,na.rm=TRUE)
+            ConfInt[2,usevariab] <- pmin(ConfInt[2,usevariab,drop=FALSE],tmp$coefficients - qnorm(1-alpha/4) * tmp$coefficientsvar,na.rm=TRUE)
             for (kc in usevariab){
                 Coeff[[kc]] <- c(Coeff[[kc]],tmp$coefficients[ which(usevariab==kc)])
                 CoeffVar[[kc]] <- c(CoeffVar[[kc]],tmp$coefficientsvar[ which(usevariab==kc)])
             }
             if(length(notusevariab)>=1){
-                Clist[1,notusevariab] <- pmax(Clist[1,notusevariab,drop=FALSE],0,na.rm=TRUE)
-                Clist[2,notusevariab] <- pmin(Clist[2,notusevariab,drop=FALSE],0,na.rm=TRUE)
+                ConfInt[1,notusevariab] <- pmax(ConfInt[1,notusevariab,drop=FALSE],0,na.rm=TRUE)
+                ConfInt[2,notusevariab] <- pmin(ConfInt[2,notusevariab,drop=FALSE],0,na.rm=TRUE)
             }
             
             
             pvall <- c(pvall,pval)
-        }        
-    }
-    colnames(Clist) <- colnames(X[,-1,drop=FALSE])
-    if(is.null(colnames(Clist))) colnames(Clist) <- paste("Variable", 1:ncol(Clist))
-
-    sig <- apply(sign(Clist[2:1, ,drop=FALSE]),2,function(x) prod(x))
-    sigo <- sign(Clist[1,])
-    maximin <- sigo*apply(abs(Clist[2:1, ,drop=FALSE]),2,min) * (sig>=0)
-
-    if(is.null(gof)){
-        modelReject <- (max(sapply(Coeff,length))==0)
-    }else{
-        modelReject <- TRUE
-        if(length(pvall)>0){
-            modelReject <- (max(pvall) < gof)
         }
     }
+    colnames(ConfInt) <- colnames(X[,-1,drop=FALSE])
+    if(is.null(colnames(ConfInt))) colnames(ConfInt) <- paste("Variable", 1:ncol(ConfInt))
 
+    sig <- apply(sign(ConfInt[2:1, ,drop=FALSE]),2,function(x) prod(x))
+    sigo <- sign(ConfInt[1,])
+    maximin <- sigo*apply(abs(ConfInt[2:1, ,drop=FALSE]),2,min) * (sig>=0)
+    pvalues <- numeric(p)
     
-    retobj <- list(ConfInt=Clist,maximinCoefficients=maximin,alpha=alpha,colnames=colnames(Clist),factor=is.factor(Y),dimX=dim(X),Coeff=Coeff,CoeffVar=CoeffVar,modelReject=modelReject,usedvariables=usedvariables)
+    modelReject <- (max(sapply(Coeff,length))==0)
+    if(!modelReject){
+        for (k in 1:p){
+            sel <- which( sapply(testsets, function(x,z) z%in% x, k))
+            pvalues[k] <- max(if(length(sel)>0) Pall[-sel] else Pall)
+        } 
+    }
+    
+    retobj <- list(ConfInt=ConfInt,maximinCoefficients=maximin,alpha=alpha,colnames=colnames(ConfInt),factor=is.factor(Y),dimX=dim(X),Coeff=Coeff,CoeffVar=CoeffVar,modelReject=modelReject,usedvariables=usedvariables,pvalues=pvalues,noEnv=length(ExpInd))
     class(retobj) <- "InvariantCausalPrediction"
     return(retobj)
 }

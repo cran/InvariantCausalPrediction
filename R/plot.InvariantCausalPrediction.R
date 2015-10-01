@@ -18,7 +18,7 @@ function(x,maxshow=50,col1=NULL,col2=NULL,col3=NULL,mar=c(10,4,3,1),lwd=1,...){
         
         par(mar=mar)
         plot( seq(0.5,maxshow+0.5,length=maxshow), seq(xvec[1],xvec[2],length=maxshow),type="n",xlab="",ylab="",axes=FALSE)
-        axis(1, at=1:maxshow,labels= x$colnames,las=2,cex.axis=1.5)
+        axis(1, at=1:maxshow,labels= x$colnames[1:maxshow],las=2,cex.axis=if(maxshow<10) 1.5 else 0.8)
         axis(2)
         abline(h=0,lwd=1,col=rgb(0.2,0.2,0.2,0.9))
         noisevec <- runif(max(sapply(CM,length)),-1,1)*0.15

@@ -1,5 +1,5 @@
 getpval <-
-function(Y,X,IN,test="approximate",maxNoObs=200){
+function(Y,X,IN,test="normal",maxNoObs=200){
 
     
     linm <- glm( Y ~ X -1, family= if(is.factor(Y)) "binomial" else "gaussian", control=glm.control(maxit=10,epsilon=10^(-6)))
@@ -16,14 +16,18 @@ function(Y,X,IN,test="approximate",maxNoObs=200){
         pval <- min(pvalvec)*(length(IN)-1)
 
     }else{
-        if(test == "approximate"){
+        useexact <- FALSE
+        if( !is.function(test)){
+            if( test=="exact") useexact <- TRUE
+        }
+        if(!useexact){
             
             K <- length(IN)
             
             resid <- residuals(linm)
             pvalvec <- numeric(length(IN))
             for (ki in 1:length(IN)){
-                pvalvec[ki] <- pvalfunc( resid[IN[[ki]]], resid[-IN[[ki]]])
+                pvalvec[ki] <- pvalfunc( resid[IN[[ki]]], resid[-IN[[ki]]],test=test)
             }
             pval <- min(pvalvec)*(length(IN)-1)
             
@@ -39,7 +43,7 @@ function(Y,X,IN,test="approximate",maxNoObs=200){
                 nk <- length(IN[[ki]])
                 nko <- n-nk
                 p <- ncol(X)
-                linm <- lm(Y[-IN[[ki]]] ~ X[-IN[[ki]],] -1) ## fit a model on all other data
+                linm <- lm.fit( X[-IN[[ki]],] , Y[-IN[[ki]]]) ## fit a model on all other data
                 pred <- as.numeric(X[IN[[ki]], ,drop=FALSE] %*% coefficients(linm))
                 diff <- Y[IN[[ki]]] - pred
                 
@@ -57,6 +61,7 @@ function(Y,X,IN,test="approximate",maxNoObs=200){
         
         pval <- min(pvalvec) * (length(IN))
     }
+    pval <- min(1,pval)
     
     return(list(pval=pval,coefficients=coefficients,coefficientsvar=coefficientsvar))
 }

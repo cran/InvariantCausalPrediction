@@ -7,7 +7,7 @@ Invariant Causal Prediction with hidden variables
 Confidence intervals for causal effects in a regression setting with possible confounders.
 }
 \usage{
-hiddenICP(X, Y, ExpInd, alpha = 0.1, mode = "asymptotic", intercept=TRUE)
+hiddenICP(X, Y, ExpInd, alpha = 0.1, mode = "asymptotic", intercept=FALSE)
 }
 \arguments{
   \item{X}{
@@ -44,11 +44,16 @@ hiddenICP(X, Y, ExpInd, alpha = 0.1, mode = "asymptotic", intercept=TRUE)
 \value{
 A list with elements
   \item{betahat}{The point estimator for the causal effects}
-  \item{maximinCoefficients}{The value in the confidence interval for each variable effects that is 
-    closest to 0. Is hence non-zero for variables with significant effects.}
+  \item{maximinCoefficients}{The value in the confidence interval for each variable effects that is closest to 0. Is hence non-zero for variables with significant effects.}
+   \item{ConfInt}{The matrix with confidence intervals for the causal
+    coefficient of all variables. 
+    First row is the upper bound and second row the lower bound.}
+  \item{pvalues}{The p-values of all variables.}
+  \item{colnames}{The column-names of the predictor variables.}
+  \item{alpha}{The chosen level.}
 }
 \references{
-    none yet...
+    none yet.
 }
 \author{
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
@@ -64,26 +69,28 @@ See package "backShift" for constructing point estimates of causal cyclic models
       set.seed(1)
     ## sample size n
       n <- 2000
-    ## 3 predictor variables
-      p  <- 3
+    ## 4 predictor variables
+      p  <- 4
     ## simulate as independent Gaussian variables
       X <- matrix(rnorm(n*p),nrow=n)
     ## divide data into observational (ExpInd=1) and interventional (ExpInd=2)
       ExpInd <- c(rep(1,n/2),rep(2,n/2))
     ## for interventional data (ExpInd==2): change distribution
-      X[ExpInd==2,] <- sweep(X[ExpInd==2,],1, 6*rnorm(p) ,FUN="*")
+      nI <- sum(ExpInd==2)
+      X[ExpInd==2,] <- X[ExpInd==2,] + matrix( 5*rt( nI*p,df=3),ncol=p)
       ## add hidden variables
-      W <- rnorm(n) * 10
-      X <- X + outer(W, rexp(p))
+      W <- rnorm(n) * 5
+      X <- X + outer(W, rep(1,4))
       
       ## first two variables are the causal predictors of Y
-      beta <- c(1,1,0)
+      beta <- c(1,1,0,0)
     ## response variable Y
-      Y <- as.numeric(X\%*\%beta + W + rnorm(n))
-      
+      Y <- as.numeric(X\%*\%beta - 2*W + rnorm(n))
+       
 
 ####### Compute "hidden Invariant Causal Prediction" Confidence Intervals
       icp <- hiddenICP(X,Y,ExpInd,alpha=0.01)
+      print(icp)
 
  ###### Print point estimates and points in the confidence interval closest to 0
       print(icp$betahat)
@@ -92,7 +99,7 @@ See package "backShift" for constructing point estimates of causal cyclic models
 
  #### compare with coefficients from a linear model
       cat("coefficients from linear model:")
-      print(coef( lm(Y ~ X-1)))
+      print(summary(lm(Y ~ X-1)))
 
 
 
@@ -101,9 +108,9 @@ See package "backShift" for constructing point estimates of causal cyclic models
 ####### 2nd example:
 ####### Simulate model X -> Y -> Z with hidden variables, trying to
 ######  estimate causal effects from (X,Z) on Y
-      set.seed(21)
+      set.seed(1)
     ## sample size n
-      n <- 2000
+      n <- 10000
     ## simulate as independent Gaussian variables
       W <- rnorm(n)
       noiseX <- rnorm(n)
@@ -122,9 +129,9 @@ See package "backShift" for constructing point estimates of causal cyclic models
       Z <- alpha*Y + noiseZ
     
 
-      
  ####### Compute "Invariant Causal Prediction" Confidence Intervals
-      icp <- hiddenICP(cbind(X,Z),Y,ExpInd,alpha=0.01)
+      icp <- hiddenICP(cbind(X,Z),Y,ExpInd,alpha=0.1)
+      print(icp)
 
  ###### Print/plot/show summary of output (truth here is (beta,0))
       print(signif(icp$betahat,3))
@@ -133,9 +140,7 @@ See package "backShift" for constructing point estimates of causal cyclic models
 
  #### compare with coefficients from a linear model
       cat("coefficients from linear model:")
-      print(signif(coef( lm(Y ~ X + Z -1)),3))
-
-      
+      print(summary(lm(Y ~ X + Z -1)))   
   
 }
 
