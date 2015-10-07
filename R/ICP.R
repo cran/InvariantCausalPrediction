@@ -1,6 +1,7 @@
 ICP <-
 function(X,Y,ExpInd,alpha=0.01, test="normal", selection = c("lasso","all","stability","boosting")[if(ncol(X)<=8) 2 else 4], maxNoVariables=8, maxNoVariablesSimult=8, maxNoObs=200, showAcceptedSets=TRUE, showCompletion=TRUE, stopIfEmpty = FALSE){
-    if(!is.matrix(X) & !is.data.frame(X)) stop("'X' must be a matrix of data frame")
+    if(is.vector(X) & is.numeric(X)) X <- matrix(X,ncol=1)
+    if(!is.matrix(X) & !is.data.frame(X)) stop("'X' must be a matrix or data frame")
     if(!is.vector(Y) & !is.factor(Y)) stop("'Y' must be a vector or factor")
     if(is.function( test)){
         pval <- test((1:10)+0.5,1:10) 

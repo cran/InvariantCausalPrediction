@@ -4,10 +4,10 @@ function(x,...){
     wh <- which( x$maximinCoefficients!=0)
     cat(paste("\n Invariant Linear Causal Regression (with hidden variables) at level ", x$alpha,sep=""))
 
-    if(ns>0) cat(paste("\n ",if(ns>1) "Variables: " else "Variable ",paste(x$colnames[wh[1:min(10,length(wh))]],collapse=", ")  ,if(length(wh)>10) paste("... (and ", length(wh)-10, "more) ",sep="") else ""," ", if(ns>1) "show" else "shows"," a significant causal effect at the chosen level ", x$alpha,sep=""))
-    sig <- apply(sign(x$ConfInt[2:1,]),2,function(x) prod(x))
+    if(ns>0) cat(paste("\n ",if(ns>1) "Variables: " else "Variable ",paste(x$colnames[wh[1:min(10,length(wh))]],collapse=", ")  ,if(length(wh)>10) paste("... (and ", length(wh)-10, "more) ",sep="") else ""," ", if(ns>1) "show" else "shows"," a significant causal effect",sep=""))
+    sig <- apply(sign(x$ConfInt[2:1,,drop=FALSE]),2,function(x) prod(x))
     sigo <- sign(x$ConfInt[1,])
-    dis <- rbind(x$ConfInt[2:1,], sigo*apply(abs(x$ConfInt[2:1,]),2,min) * (sig>=0),x$pvalues)
+    dis <- rbind(x$ConfInt[2:1, ,drop=FALSE], sigo*apply(abs(x$ConfInt[2:1, ,drop=FALSE]),2,min) * (sig>=0),x$pvalues)
     colnames(dis) <- x$colnames
     rownames(dis) <- c( paste(" LOWER BOUND",sep=""),paste(" UPPER BOUND",sep=""),  " MAXIMIN EFFECT", " P-VALUE")
                                         #dis <- dis[ ,wh,drop=FALSE]
