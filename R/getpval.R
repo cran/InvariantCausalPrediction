@@ -43,7 +43,7 @@ function(Y,X,IN,test="normal",maxNoObs=200){
                 nk <- length(IN[[ki]])
                 nko <- n-nk
                 p <- ncol(X)
-                linm <- lm.fit( X[-IN[[ki]],] , Y[-IN[[ki]]]) ## fit a model on all other data
+                linm <- lm.fit( X[-IN[[ki]], ,drop=FALSE] , Y[-IN[[ki]]]) ## fit a model on all other data
                 pred <- as.numeric(X[IN[[ki]], ,drop=FALSE] %*% coefficients(linm))
                 diff <- Y[IN[[ki]]] - pred
                 

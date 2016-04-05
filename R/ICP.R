@@ -99,7 +99,7 @@ function(X,Y,ExpInd,alpha=0.01, test="normal", selection = c("lasso","all","stab
         
         ConfInt <- matrix(0,nrow=2,ncol=p)
         pvall <- c(pvall, pvalempty)
-        if(showAcceptedSets) cat(paste("\n  accepted empty set"))
+        if(showAcceptedSets) cat(paste("\n accepted empty set"))
         if(stopIfEmpty) cont <- FALSE
     }
     testsets <- if( any(!is.null(c(maxNoVariables,maxNoVariablesSimult))))  getblanket(X[,-1,drop=FALSE],Y,maxNoVariables=maxNoVariables,maxNoVariablesSimult=maxNoVariablesSimult) else getblanket(X[,-1,drop=FALSE],Y)
@@ -109,8 +109,8 @@ function(X,Y,ExpInd,alpha=0.01, test="normal", selection = c("lasso","all","stab
 
     
     lc <- 0
-
-    printoutat <- 2^(1:ceiling(log2(length(testsets))))
+    
+    printoutat <- ifelse(length(testsets) > 0, 2^(1:ceiling(log2(length(testsets)))), NA)
     while(cont && lc < length(testsets)){
         if(showCompletion){
             if( lc %in% printoutat){
@@ -147,16 +147,16 @@ function(X,Y,ExpInd,alpha=0.01, test="normal", selection = c("lasso","all","stab
     sig <- apply(sign(ConfInt[2:1, ,drop=FALSE]),2,function(x) prod(x))
     sigo <- sign(ConfInt[1,])
     maximin <- sigo*apply(abs(ConfInt[2:1, ,drop=FALSE]),2,min) * (sig>=0)
-    pvalues <- numeric(p)
+    pvalues <- rep(1,p)
     
     modelReject <- (max(sapply(Coeff,length))==0)
     if(!modelReject){
         for (k in 1:p){
             sel <- which( sapply(testsets, function(x,z) z%in% x, k))
-            pvalues[k] <- max(if(length(sel)>0) Pall[-sel] else Pall)
+#            pvalues[k] <- max(if(length(sel)>0) Pall[-sel] else Pall)
+            pvalues[k] <- max(if(length(sel)>0) max(Pall[-sel],pvalempty) else max(Pall, pvalempty))
         } 
     }
-    
     retobj <- list(ConfInt=ConfInt,maximinCoefficients=maximin,alpha=alpha,colnames=colnames(ConfInt),factor=is.factor(Y),dimX=dim(X),Coeff=Coeff,CoeffVar=CoeffVar,modelReject=modelReject,usedvariables=usedvariables,pvalues=pvalues,noEnv=length(ExpInd))
     class(retobj) <- "InvariantCausalPrediction"
     return(retobj)
