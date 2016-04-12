@@ -3,9 +3,12 @@ function(x,...){
     ns <- sum(x$maximinCoefficients!=0)
     wh <- which( x$maximinCoefficients!=0)
     cat(paste("\n Invariant Linear Causal", if(x$factor)" Classification " else " Regression ", "at level ", x$alpha, " (including multiplicity correction for the number of variables)",sep=""))
-    if(x$modelReject){2
-        cat(paste("\n Model has been rejected at the chosen level, that is no subset of variables leads to invariance across the environments. This can be for example due to  presence of \n (a) non-linearities or \n (b) hidden variables or \n (c) interventions on the target variable. \n",sep=""))
-             cat(paste("\n We will try to extend the functionality soon to allow non-linear models and address issue (a) [non-linearity], which currently leads to rejection of the linear model."))
+    if(x$modelReject){
+        cat(paste("\n Model has been rejected at the chosen level ",x$gof,", that is no subset of variables leads to invariance across the environments. This can be for example due to  presence of \n (a) non-linearities or \n (b) hidden variables or \n (c) interventions on the target variable. \n",sep=""))
+        if(x$stopIfEmpty){
+            cat("\n In this run, option 'stopIfEmpty' was set to TRUE so not all sets of variables have maybe been tested; rerun with option set to FALSE to get definite answer whether model is rejected")
+        }
+          cat(paste("\n We will try to extend the functionality soon to allow non-linear models and address issue (a) [non-linearity], which currently leads to rejection of the linear model."))
           cat(paste("\n If the reason might be related to issue (b) [presence of hidden variables], one can use function hiddenICP which allows for hidden variables."))
           if(x$noEnv>2) cat(paste("\n If the reason might be related to issue (c) [interventions on the target in some environments], could repeat analysis while using only two of the ", x$noEnv," environments in one analysis and then taking the union of causal effects over all pairs of environments (interventions on the target in a given pair of environments will in general yield an empty set of estimated causal variables) ",sep=""))
     }else{

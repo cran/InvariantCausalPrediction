@@ -2,7 +2,7 @@ import(graphics,glmnet,mboost)
 importFrom("grDevices", "hsv", "rgb")
 importFrom("stats", "coef", "cov", "glm", "glm.control", "lm", "pf",
              "predict", "printCoefmat", "pt", "qnorm", "residuals",
-             "runif", "sd", "t.test", "var", "var.test","ks.test", "lm.fit")
+             "runif", "sd", "t.test", "var", "var.test","ks.test", "lm.fit","cor.test")
 export(ICP,hiddenICP)
 S3method(summary,InvariantCausalPrediction)
 S3method(plot, InvariantCausalPrediction)

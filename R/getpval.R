@@ -1,5 +1,5 @@
 getpval <-
-function(Y,X,IN,test="normal",maxNoObs=200){
+function(Y,X,IN,test="correlation",maxNoObs=200){
 
     
     linm <- glm( Y ~ X -1, family= if(is.factor(Y)) "binomial" else "gaussian", control=glm.control(maxit=10,epsilon=10^(-6)))
@@ -28,6 +28,16 @@ function(Y,X,IN,test="normal",maxNoObs=200){
             pvalvec <- numeric(length(IN))
             for (ki in 1:length(IN)){
                 pvalvec[ki] <- pvalfunc( resid[IN[[ki]]], resid[-IN[[ki]]],test=test)
+                if(!is.function(test)){
+                    if(test=="correlation"){
+                        nonzerosd <- which(apply(X,2,sd)>0)
+                        if(length(nonzerosd)>0){
+                            corpval <- numeric(length(nonzerosd))
+                            for (k in 1:length(corpval)) corpval[k] <- cor.test(X[IN[[ki]],nonzerosd[k]], resid[IN[[ki]]])$p.value
+                            pvalvec[ki] <- 2*min(pvalvec[ki], length(corpval)*min(corpval))
+                        }
+                    }
+                }
             }
             pval <- min(pvalvec)*(length(IN)-1)
             

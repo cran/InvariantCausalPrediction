@@ -14,7 +14,8 @@ ICP(X, Y, ExpInd, alpha=0.01, test = "normal",
               maxNoObs = 200,
               showAcceptedSets = TRUE,
               showCompletion = TRUE,
-              stopIfEmpty = FALSE)
+              stopIfEmpty = FALSE,
+              gof = max(0.01,alpha))
 }
 \arguments{
   \item{X}{
@@ -39,7 +40,7 @@ ICP(X, Y, ExpInd, alpha=0.01, test = "normal",
      Determines coverage of the confidence regions. \code{alpha} is the probability of non-coverage, so the default of 0.01 produces 99\% confidence intervals. If no model has a p-value of at least \code{alpha}, the model assumptions seem violated and \code{modelReject} will return \code{TRUE}.
 }
   \item{test}{
-  Use "exact" for an exact test in a regression setting, especially if sample size is small. However, this test is computationally demanding if sample size is high. Defaults to "normal" that tests for a shift in mean and variance between two populations. Other options are "ranks" that uses a rank-based alternative and "ks" for a Kolmogorov-Smirnov test. It is also possible to supply a function of the form \code{function(x,z)}  that takes samples \code{x} and \code{z} of two populations as arguments and whose return value is the p-value for the null hypothesis that the two underlying distribution are identical.
+  Use "exact" for an exact test in a regression setting, especially if sample size is small. However, this test is computationally demanding if sample size is high. The default "normal" tests for a shift in mean and variance of the residuals between different populations/environments. Using "correlation" tests additionally for vanishing correlation between predictor variables and residuals in each environment. Other options are "ranks" that uses a rank-based alternative and "ks" for a Kolmogorov-Smirnov test to detect differences in the distributions of the residuals between different environments. It is also possible to supply a function of the form \code{function(x,z)}  that takes samples \code{x} and \code{z} of two populations as arguments and whose return value is the p-value for the null hypothesis that the two underlying distribution are identical.
 }
   \item{selection}{
   The method for pre-selection of variables to save computational resources. 
@@ -74,6 +75,11 @@ ICP(X, Y, ExpInd, alpha=0.01, test = "normal",
   computational time in these cases, but means that the confidence intervals lose their
   coverage properties for values different to 0.
 }
+ \item{gof}{
+ If no set of variables (including the empty set) leads to a p-value larger than the goodness-of-fit cutoff \code{gof}, 
+the whole model will be rejected. If the model is correct, this will happen with a probability of \code{gof} 
+and this option protects again making statements when the model is obviously not suitable for the data.
+}
 }
 
 \value{
@@ -91,7 +97,10 @@ A list with elements
   \item{modelReject}{Logical indicating if the whole model was rejected (the p-value of the best fitting model is too low).}
   \item{usedvariables}{The pre-selected variables if not all variables are used for the analysis; otherwise all variables.}
   \item{pvalues}{The p-values of all variables.}
+  \item{stopIfEmpty}{A boolean value indicating whether computations stop as soon as intersection of accepted sets is empty.}
   \item{noEnv}{The number of distinct environments.}
+  \item{gof}{The goodness-of-fit cutoff \code{gof} used.}
+  \item{bestModel}{The largest p-value across all tested sets of variables.}
 }
 \references{
  Jonas Peters, Peter Buhlmann, Nicolai Meinshausen (2015):
