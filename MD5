@@ -1,6 +1,6 @@
-4712628b3f3b4aa638cc005c8031cfd8 *DESCRIPTION
+91c3458bc8782a313184ae91e7f09a1b *DESCRIPTION
 2bf3d5326aad8580f8cccfe6b3385500 *NAMESPACE
-ef10d728fe549badfcddcefc830d71af *R/ICP.R
+85a75f0aff11525ab45b8eb266529ad8 *R/ICP.R
 804ab5fd623f41439123fe248b24a4ad *R/getblanketall.R
 b6580b7f417ab52cb5e01f127a946c3e *R/getblanketboosting.R
 f2b4f1c2a468c9ecce0b960ed1b75e33 *R/getblanketlasso.R
@@ -14,7 +14,7 @@ e0fb871dca4f3980eb9f425495360778 *R/plot.InvariantCausalPrediction.R
 61b3b8cd169b45907605c300dcc215ca *R/pvalfunc.R
 94db57e01a51ff044d4c4a60b76be03c *R/summary.InvariantCausalPrediction.R
 12019fbcedaf19afd94c789f4c12db25 *man/ICP.Rd
-85986aedfe31a2b79993f8ea8050fcc6 *man/InvariantCausalPrediction-package.Rd
+ed8a7e844d7173ff84dd3626330cb789 *man/InvariantCausalPrediction-package.Rd
 a2066a1c05b6a7c34b6e2ecb8e2dbe72 *man/hiddenICP.Rd
 2b31bf62c982a914b6350cdac3289031 *man/plot.InvariantCausalPrediction.Rd
 7d58e3b1d43c5132edbdefca262811a5 *man/summary.InvariantCausalPrediction.Rd

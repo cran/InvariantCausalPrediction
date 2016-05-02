@@ -205,7 +205,7 @@ ICP <- function (X, Y, ExpInd, alpha = 0.01, test = "normal", selection = c("las
     retobj <- list(ConfInt = ConfInt, maximinCoefficients = maximin, 
         alpha = alpha, colnames = colnames(ConfInt), factor = is.factor(Y), 
         dimX = dim(X), Coeff = Coeff, CoeffVar = CoeffVar, modelReject = modelReject, 
-        usedvariables = usedvariables, pvalues = pvalues, stopfIfEmpty=stopIfEmpty, noEnv = length(ExpInd), gof=gof, bestModel=max(c(pvalempty,Pall)))
+        usedvariables = usedvariables, pvalues = pvalues, stopIfEmpty=stopIfEmpty, noEnv = length(ExpInd), gof=gof, bestModel=max(c(pvalempty,Pall)))
     class(retobj) <- "InvariantCausalPrediction"
     return(retobj)
 }
