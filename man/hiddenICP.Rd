@@ -52,15 +52,20 @@ A list with elements
   \item{colnames}{The column-names of the predictor variables.}
   \item{alpha}{The chosen level.}
 }
-\references{
-    none yet.
-}
 \author{
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 }
-\seealso{  \code{\link{ICP}} for reconstructing the parents of a variable 
+\seealso{ \code{\link{causalDantzig}} for a more recent version of this function.
+\code{\link{ICP}} for reconstructing the parents of a variable 
 under arbitrary interventions on all other variables (but no hidden variables). 
 See package "backShift" for constructing point estimates of causal cyclic models in the presence of hidden variables (again under shift interventions) .
+}
+\references{
+Dominik Rothenhausler, Peter Buhlmann, Nicolai Meinshausen (2017):
+
+Causal Dantzig: fast inference in linear structrual equation models with hidden variables under additive interventions
+
+arxiv preprint \url{https://arxiv.org/abs/1706.06159}
 }
 \examples{
  ##########################################

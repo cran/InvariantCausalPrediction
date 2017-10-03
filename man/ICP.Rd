@@ -95,6 +95,7 @@ A list with elements
    \item{Coeff}{A list which contains for all variables the vector with point-estimates among all accepted sets where the variable was part of the set.}
   \item{CoeffVar}{Same as \code{Coeff} but with the standard deviation of the point-estimate.}
   \item{modelReject}{Logical indicating if the whole model was rejected (the p-value of the best fitting model is too low).}
+  \item{acceptedSets}{A list with one element per accepted set. For each accepted model the list entry is a vector that contains the indices of the variables in the accepted set.}
   \item{usedvariables}{The pre-selected variables if not all variables are used for the analysis; otherwise all variables.}
   \item{pvalues}{The p-values of all variables.}
   \item{stopIfEmpty}{A boolean value indicating whether computations stop as soon as intersection of accepted sets is empty.}
@@ -112,7 +113,7 @@ A list with elements
 \author{
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 }
-\seealso{  \code{\link{hiddenICP}} for reconstructing the parents of a variable in the presence of  hidden variables (but assuming shift/additive interventions), which also allows construction of confidence intervals for the causal coefficients. See package "backShift" for constructing point estimates of causal cyclic models in the presence of hidden variables (again under shift interventions). 
+\seealso{  \code{\link{causalDantzig}} for reconstructing the parents of a variable in the presence of  hidden variables (but assuming shift/additive interventions), which also allows construction of confidence intervals for the causal coefficients. See package "backShift" for constructing point estimates of causal cyclic models in the presence of hidden variables (again under shift interventions). 
 }
 \examples{
  ##########################################

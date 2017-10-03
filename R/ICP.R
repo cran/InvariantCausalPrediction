@@ -132,6 +132,7 @@ ICP <- function (X, Y, ExpInd, alpha = 0.01, test = "normal", selection = c("las
     printoutat <- ifelse(length(testsets) > 0, 2^(1:ceiling(log2(length(testsets)))), 
         NA)
     if(cont & stopIfEmpty) intersection <- NULL
+    acceptedSets <- list()
     while (cont && lc < length(testsets)) {
         if (showCompletion) {
             if (lc %in% printoutat) {
@@ -156,6 +157,7 @@ ICP <- function (X, Y, ExpInd, alpha = 0.01, test = "normal", selection = c("las
                 }
                 if( length(intersect)==0) cont <- FALSE
             }
+            acceptedSets[[length(acceptedSets)+1]] <- usevariab
                 
             if (showAcceptedSets) 
                 cat(paste("\n accepted set of variables ", paste(usevariab, 
@@ -194,8 +196,9 @@ ICP <- function (X, Y, ExpInd, alpha = 0.01, test = "normal", selection = c("las
         for (k in usedvariables) {
             sel <- which(sapply(testsets, function(x, z) z %in% 
                 x, k))
-            pvalues[k] <- max(if (length(sel) > 0) max(Pall[-sel], 
-                pvalempty) else max(Pall, pvalempty))
+           if(length(sel) > 0){
+               pvalues[k] <- if(length(Pall[-sel])>0) max(Pall[-sel], pvalempty) else 1
+           }
         }
     }else{
         ConfInt <-  NULL
@@ -204,7 +207,7 @@ ICP <- function (X, Y, ExpInd, alpha = 0.01, test = "normal", selection = c("las
         
     retobj <- list(ConfInt = ConfInt, maximinCoefficients = maximin, 
         alpha = alpha, colnames = colnames(ConfInt), factor = is.factor(Y), 
-        dimX = dim(X), Coeff = Coeff, CoeffVar = CoeffVar, modelReject = modelReject, 
+        dimX = dim(X), Coeff = Coeff, CoeffVar = CoeffVar, modelReject = modelReject, acceptedSets = acceptedSets,
         usedvariables = usedvariables, pvalues = pvalues, stopIfEmpty=stopIfEmpty, noEnv = length(ExpInd), gof=gof, bestModel=max(c(pvalempty,Pall)))
     class(retobj) <- "InvariantCausalPrediction"
     return(retobj)
