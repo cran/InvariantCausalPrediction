@@ -12,14 +12,14 @@ Confidence intervals for causal prediction in a regression setting. An experimen
 \tabular{ll}{
 Package: \tab InvariantCausalPrediction\cr
 Type: \tab Package\cr
-Version: \tab 0.7-1\cr
-Date: \tab 2017-10-02\cr
+Version: \tab 0.6-1\cr
+Date: \tab 2016-05-02\cr
 License: \tab GPL\cr
 }
-Confidence intervals can be computed with function \code{ICP}, both for regression and binary classification. For causal inference with hidden variables, use \code{causalDantzig}. \code{print}, \code{plot} and \code{summary} methods are available. 
+Confidence intervals can be computed with function \code{ICP}, both for regression and binary classification. \code{print}, \code{plot} and \code{summary} methods are available. 
 }
 \author{
-Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>, Dominik Rothenhaeusler <rothenhaeusler@stat.math.ethz.ch>
+Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 
 Maintainer: Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 }

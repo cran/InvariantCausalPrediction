@@ -67,9 +67,9 @@ function(Y,X,IN,test="correlation",maxNoObs=200){
                 
                 pvalvec[ki] <- pval
             }
+            pval <- min(pvalvec) * (length(IN))
         }
         
-        pval <- min(pvalvec) * (length(IN))
     }
     pval <- min(1,pval)
     

@@ -113,7 +113,7 @@ A list with elements
 \author{
 Nicolai Meinshausen <meinshausen@stat.math.ethz.ch>
 }
-\seealso{  \code{\link{causalDantzig}} for reconstructing the parents of a variable in the presence of  hidden variables (but assuming shift/additive interventions), which also allows construction of confidence intervals for the causal coefficients. See package "backShift" for constructing point estimates of causal cyclic models in the presence of hidden variables (again under shift interventions). 
+\seealso{  \code{\link{hiddenICP}} for reconstructing the parents of a variable in the presence of  hidden variables (but assuming shift/additive interventions), which also allows construction of confidence intervals for the causal coefficients. See package "backShift" for constructing point estimates of causal cyclic models in the presence of hidden variables (again under shift interventions). 
 }
 \examples{
  ##########################################
