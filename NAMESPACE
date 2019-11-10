@@ -1,4 +1,6 @@
-import(graphics,glmnet,mboost)
+import(graphics)
+importFrom("mboost", "glmboost","show")
+importFrom("glmnet", "glmnet")
 importFrom("grDevices", "hsv", "rgb")
 importFrom("stats", "coef", "cov", "glm", "glm.control", "lm", "pf",
              "predict", "printCoefmat", "pt", "qnorm", "residuals",
